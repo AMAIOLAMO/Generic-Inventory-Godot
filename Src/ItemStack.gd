@@ -12,21 +12,20 @@ func add(amount: int) -> int:
 	var result = self.amount + amount
 	var stackLimit = info.stackLimit
 	if result > stackLimit:
-		amount = stackLimit
+		self.amount = stackLimit
 		return result - stackLimit
 	# else
-	
-	amount = result
+	self.amount = result
 	return 0
 
 func reduce(amount: int) -> int:
 	var result = self.amount - amount
 	if result < 0:
 		# make sure this is positive
-		amount = 0 # normally this should not exist, but if this is 0, then that means you forgot to remove this item stack
+		self.amount = 0 # normally this should not exist, but if this is 0, then that means you forgot to remove this item stack
 		return -result
 	# else
-	amount = result
+	self.amount = result
 	return 0
 
 func is_full() -> bool:

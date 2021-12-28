@@ -11,15 +11,20 @@ func set_item(index: int, itemStack: ItemStack) -> void:
 	emit_signal("changed")
 
 func add_item(itemInfo: ItemInfo, amount: int, maxStackCount: int = 99999999) -> int:
-	var remaining = _add_into_existing(itemInfo, amount)
+	var remaining = _add_into_existing_slots(itemInfo, amount)
 	
-	remaining = _append_to_end(itemInfo, remaining, maxStackCount)
+	if remaining > 0:
+		remaining = _append_to_end(itemInfo, remaining, maxStackCount)
 	
 	# after adding
 	if remaining != amount:
 		emit_signal("changed")
+		print("changed")
 	
 	return remaining
+
+func add_stack(itemStack: ItemStack, maxStackCount: int = 99999999) -> int:
+	return add_item(itemStack.info, itemStack.amount, maxStackCount)
 
 func get_item(index: int) -> ItemStack:
 	return _itemStacks[index]
@@ -30,22 +35,19 @@ func size() -> int:
 func get_item_stacks() -> Array:
 	return _itemStacks
 
-func _add_into_existing(itemInfo: ItemInfo, amount: int) -> int:
+func _add_into_existing_slots(itemInfo: ItemInfo, amount: int) -> int:
 	var remaining = amount
 	for i in size():
 		if remaining <= 0: break
 		
 		var currentStack: ItemStack = _itemStacks[i]
 		
-		if currentStack:
-			if _can_stack_together(currentStack.info, itemInfo):
-				remaining = currentStack.add(remaining)
-			continue
-		# else empty slot
+		if not currentStack: continue
+		if not _can_stack_together(currentStack.info, itemInfo): continue
+		# else
 		
-		var newStack = ItemStack.new(itemInfo, 0)
-		remaining = newStack.add(remaining)
-		_itemStacks[i] = newStack
+		remaining = currentStack.add(remaining)
+	
 	return remaining
 
 func _append_to_end(itemInfo: ItemInfo, amount: int, maxStackCount: int) -> int:
