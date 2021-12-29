@@ -54,7 +54,7 @@ func _append_to_end(itemInfo: ItemInfo, amount: int, maxStackCount: int) -> int:
 	var remaining = amount
 	
 	var i = max(size() - 1, 0)
-	while i < maxStackCount - 1:
+	while i < maxStackCount:
 		if remaining <= 0: break
 		# else
 		
