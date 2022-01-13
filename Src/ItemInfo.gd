@@ -10,6 +10,7 @@ func _is_in_built_in_group(group: String) -> bool:
 	return false
 
 export var name: String
+export var description: String
 export var texture: Texture
 export var stackLimit: int
 
