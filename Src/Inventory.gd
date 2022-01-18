@@ -6,9 +6,36 @@ func _init(initialSize: int = 0) -> void:
 	if initialSize > 0:
 		_itemStacks.resize(initialSize)
 
-func remove_item(index: int) -> void:
+func remove(index: int) -> void:
 	_itemStacks.remove(index)
 	emit_signal("changed")
+
+func has(itemInfo: ItemInfo) -> bool:
+	printerr("not implemented")
+	return false # not implemented
+
+func has_enough(itemInfo: ItemInfo, amount: int) -> bool:
+	printerr("not implemented")
+	return false # not implemented
+
+func reduce_item(itemInfo: ItemInfo, amount: int) -> int:
+	var remainingReduceAmount := amount
+	
+	for i in _itemStacks.size():
+		var stack: ItemStack = _itemStacks[i]
+		if not stack: continue
+		if stack.info != itemInfo: continue
+		# else
+		
+		remainingReduceAmount = _reduce_item_single_internal(i, remainingReduceAmount)
+		if remainingReduceAmount == 0:
+			emit_signal("changed")
+			return 0
+	# else
+	
+	emit_signal("changed")
+	
+	return remainingReduceAmount
 
 func set_item(index: int, itemStack: ItemStack) -> void:
 	_itemStacks[index] = itemStack
@@ -46,6 +73,20 @@ func empty() -> bool:
 
 func get_item_stacks() -> Array:
 	return _itemStacks
+
+# NOTE: this doesn't call signals (will give errors if current cell is empty)
+# returns remaining to reduce (if slot has 10, given reduce amount is 20, returns 20 - 10, else 0)
+func _reduce_item_single_internal(index: int, amount: int) -> int:
+	var item: ItemStack = _itemStacks[index]
+	
+	var result: int = item.reduce(amount)
+	
+	if item.amount == 0:
+		_itemStacks[index] = null
+		return result
+	# else
+	
+	return 0
 
 func _add_into_existing_slots(itemInfo: ItemInfo, amount: int) -> int:
 	var remaining = amount
